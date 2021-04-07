@@ -1,0 +1,35 @@
+import me.zeb.common.model.Category;
+
+CREATE TABLE subproduct (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    order_gamekey TEXT,
+    machine_name TEXT NOT NULL,
+    url TEXT NOT NULL,
+    human_name TEXT NOT NULL,
+    custom_download_page_box_html TEXT,
+    icon TEXT,
+    category TEXT AS Category NOT NULL,
+    cached_icon BLOB,
+    FOREIGN KEY (order_gamekey)
+           REFERENCES humbleOrder (gamekey)
+);
+
+insert:
+INSERT INTO subproduct (
+    order_gamekey,
+    machine_name,
+    url,
+    human_name,
+    custom_download_page_box_html,
+    icon,
+    category
+) VALUES ?;
+
+all:
+SELECT * FROM subproduct;
+
+canCacheIcon:
+SELECT * FROM subproduct WHERE icon IS NOT NULL AND icon != '' AND cached_icon IS NULL;
+
+cacheIcon:
+UPDATE subproduct SET cached_icon = ? WHERE id = ?;

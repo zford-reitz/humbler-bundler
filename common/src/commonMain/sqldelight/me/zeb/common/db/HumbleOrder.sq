@@ -1,0 +1,13 @@
+CREATE TABLE humbleOrder (
+    gamekey TEXT NOT NULL PRIMARY KEY ,
+    created TEXT NOT NULL,
+    category TEXT NOT NULL,
+    human_name TEXT NOT NULL,
+    machine_name TEXT NOT NULL
+);
+
+countForGamekey:
+SELECT COUNT(gamekey) FROM humbleOrder WHERE gamekey = ?;
+
+insert:
+INSERT INTO humbleOrder (gamekey, created, category, human_name, machine_name) VALUES ?;

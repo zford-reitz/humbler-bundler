@@ -1,0 +1,19 @@
+CREATE TABLE download (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    subproduct_id INTEGER,
+    machineName TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    downloadIdentifier TEXT NOT NULL,
+    downloadVersionNumber INTEGER,
+    FOREIGN KEY (subproduct_id)
+           REFERENCES subproduct (id)
+);
+
+insert:
+INSERT INTO download (
+    subproduct_id,
+    machineName,
+    platform,
+    downloadIdentifier,
+    downloadVersionNumber
+) VALUES ?;

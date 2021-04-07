@@ -1,0 +1,27 @@
+CREATE TABLE cookie (
+    name TEXT NOT NULL,
+    value TEXT NOT NULL,
+    expiresAt INTEGER NOT NULL,
+    domain TEXT NOT NULL,
+    path TEXT NOT NULL,
+    secure INTEGER AS Boolean NOT NULL DEFAULT 0,
+    httpOnly INTEGER AS Boolean NOT NULL DEFAULT 0,
+    persistent INTEGER AS Boolean NOT NULL DEFAULT 0,
+    hostOnly INTEGER AS Boolean NOT NULL DEFAULT 0,
+    PRIMARY KEY (name, domain)
+);
+
+insert:
+REPLACE INTO cookie(name,
+                       value,
+                       expiresAt,
+                       domain,
+                       path,
+                       secure,
+                       httpOnly,
+                       persistent,
+                       hostOnly)
+VALUES ?;
+
+all:
+SELECT * FROM cookie;

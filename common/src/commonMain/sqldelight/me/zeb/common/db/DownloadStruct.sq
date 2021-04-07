@@ -1,0 +1,13 @@
+CREATE TABLE downloadStruct (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    download_id INTEGER,
+    sha1 TEXT NOT NULL,
+    name TEXT NOT NULL,
+    web_url TEXT,
+    human_size TEXT,
+    file_size INTEGER,
+    small INTEGER,
+    md5 TEXT,
+    FOREIGN KEY (download_id)
+           REFERENCES download (id)
+);
