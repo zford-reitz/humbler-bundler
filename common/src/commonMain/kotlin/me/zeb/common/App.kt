@@ -138,12 +138,10 @@ fun fetchAllOrders(gson: Gson) {
 
 fun fetchOrder(gamekey: String) {
     val request = Request.Builder()
-        .url("https://www.humblebundle.com/api/v1/order/${gamekey}")
-        .addHeader("ajax", "true")
+        .url("https://www.humblebundle.com/api/v1/order/${gamekey}?all_tpkds=true")
         .addHeader("Accept", "application/json")
         .addHeader("Accept-Charset", "utf-8")
         .addHeader("Keep-Alive", "true")
-        .addHeader("X-Requested-By", "hb_android_app")
         .get()
         .build()
 
