@@ -14,12 +14,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
+import me.zeb.common.db.Download
+import me.zeb.common.db.DownloadStruct
 import me.zeb.common.db.HumbleOrder
 import me.zeb.common.db.Subproduct
 import me.zeb.common.model.Category
-import me.zeb.common.model.json.Gamekey
-import me.zeb.common.model.json.JsonHumbleOrder
-import me.zeb.common.model.json.JsonSubproduct
+import me.zeb.common.model.json.*
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -175,6 +175,14 @@ fun writeBundlesToDatabase(gson: Gson) {
                 val gamekey = jsonHumbleOrder.gamekey
                 for (jsonSubproduct in jsonHumbleOrder.subproducts) {
                     db.subproductQueries.insert(jsonSubproduct.toSubproduct(gamekey))
+                    val subproductId = db.subproductQueries.lastInsertRowId().executeAsOne()
+                    for (jsonDownload in jsonSubproduct.downloads) {
+                        db.downloadQueries.insert(jsonDownload.toDownload(subproductId))
+                        val downloadId = db.downloadQueries.lastInsertRowId().executeAsOne()
+                        for (jsonDownloadStruct in jsonDownload.downloadStruct) {
+                            db.downloadStructQueries.insert(jsonDownloadStruct.toDownloadStruct(downloadId))
+                        }
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -195,6 +203,31 @@ fun JsonSubproduct.toSubproduct(gamekey: String): Subproduct {
         icon = icon,
         category = category(),
         cached_icon = null
+    )
+}
+
+fun JsonDownload.toDownload(subproductId: Long): Download {
+    return Download(
+        id = 0,
+        subproduct_id = subproductId,
+        machineName = machineName,
+        platform = platform,
+        downloadIdentifier = downloadIdentifier,
+        downloadVersionNumber = downloadVersionNumber?.toLong()
+    )
+}
+
+fun JsonDownloadStruct.toDownloadStruct(downloadId: Long): DownloadStruct {
+    return DownloadStruct(
+        id = 0,
+        download_id = downloadId,
+        sha1 = sha1,
+        name = name ?: "NO_NAME",
+        web_url = url?.web,
+        human_size = humanSize,
+        file_size = fileSize,
+        small = small?.toLong(),
+        md5 = md5
     )
 }
 

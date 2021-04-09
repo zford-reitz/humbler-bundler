@@ -3,7 +3,7 @@ CREATE TABLE download (
     subproduct_id INTEGER,
     machineName TEXT NOT NULL,
     platform TEXT NOT NULL,
-    downloadIdentifier TEXT NOT NULL,
+    downloadIdentifier TEXT,
     downloadVersionNumber INTEGER,
     FOREIGN KEY (subproduct_id)
            REFERENCES subproduct (id)
@@ -17,3 +17,6 @@ INSERT INTO download (
     downloadIdentifier,
     downloadVersionNumber
 ) VALUES ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

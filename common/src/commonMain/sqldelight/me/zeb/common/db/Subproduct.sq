@@ -25,6 +25,9 @@ INSERT INTO subproduct (
     category
 ) VALUES ?;
 
+lastInsertRowId:
+SELECT last_insert_rowid();
+
 all:
 SELECT * FROM subproduct;
 
