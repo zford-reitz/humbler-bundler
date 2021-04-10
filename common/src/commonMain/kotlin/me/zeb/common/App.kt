@@ -234,8 +234,8 @@ fun JsonDownloadStruct.toDownloadStruct(downloadId: Long): DownloadStruct {
 fun JsonSubproduct.category(): Category {
     val hasComicDownloads = downloads
         .flatMap { it.downloadStruct }
-        .map { it.name?.toLowerCase() }
-        .any { it == "cbz" || it == "cbr" }
+        .map { it.name.orEmpty().toLowerCase()}
+        .any { it.contains("cbz") || it.contains("cbr") }
 
     if (hasComicDownloads) return Category.COMIC
 
