@@ -239,7 +239,7 @@ fun JsonSubproduct.category(): Category {
 
     if (hasComicDownloads) return Category.COMIC
 
-    if (downloads.any { it.platform.toLowerCase() == "ebook" }) return Category.EBOOK
+    if (downloads.all { it.platform.toLowerCase() == "ebook" }) return Category.EBOOK
 
     return Category.OTHER
 }
