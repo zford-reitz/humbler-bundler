@@ -39,6 +39,8 @@ fun App() {
     var gamekey by remember { mutableStateOf("") }
     val gson = Gson()
     val bundleitems = db!!.subproductQueries.all().executeAsList()
+        .distinctBy { it.human_name }
+        .sortedBy { it.human_name }
 
     MaterialTheme {
         Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
