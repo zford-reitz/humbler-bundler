@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +35,8 @@ val client = OkHttpClient.Builder()
 // https://www.schiff.io/projects/humble-bundle-api
 @Composable
 fun App() {
+    val scaffoldState = rememberScaffoldState()
+
     var username by remember { mutableStateOf("") }
     val password = remember { mutableStateOf(TextFieldValue()) }
     var guardCode by remember { mutableStateOf("") }
@@ -43,71 +47,88 @@ fun App() {
         .sortedBy { it.human_name }
 
     MaterialTheme {
-        Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
-            TextField(value = username, onValueChange = { username = it }, label = { Text("Username") })
-            TextField(
-                value = password.value,
-                onValueChange = { password.value = it },
-                label = { Text(text = "Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
-                )
-            )
-            TextField(value = guardCode, onValueChange = { guardCode = it }, label = { Text("Guard code") })
-            Button(onClick = {
-                login(username = username, password = password.value.text, guardCode = guardCode)
-            }) {
-                Text("Login")
-            }
-            TextField(value = gamekey, onValueChange = { gamekey = it }, label = { Text("Bundle key") })
-            Button(onClick = {
-                fetchOrder(gamekey)
-            }) {
-                Text("Fetch a Bundle")
-            }
-            Button(onClick = {
-                fetchAllOrders(gson)
-            }) {
-                Text("Fetch all Bundles")
-            }
-            Button(onClick = {
-                writeBundlesToDatabase(gson)
-            }) {
-                Text("Write Bundles to database")
-            }
-            Button(onClick = {
-                fetchIcons()
-            }) {
-                Text("Fetch icons")
-            }
-            LazyColumn(
-                modifier = Modifier.fillMaxHeight()) {
-                items(items = bundleitems, itemContent = { item ->
-                    Card(
-                        shape = RoundedCornerShape(8.dp),
-                        backgroundColor = MaterialTheme.colors.surface,
-                        border = BorderStroke(1.dp, Color.Black),
-                        modifier = Modifier.padding(4.dp).fillMaxWidth(),
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(4.dp),
-                        ){
-                            Text(text = item.human_name)
-                            Text(text = " (${item.category.name})")
+        Scaffold(
+            scaffoldState = scaffoldState,
+            drawerContent = { Text("Drawer content") },
+            topBar = {
+                TopAppBar(
+                    title = { Text("Humbler Bundler") },
+                    navigationIcon = {
+                        IconButton(onClick = { scaffoldState.drawerState.open() }) {
+                            Icon(Icons.Default.Menu)
                         }
+                    })
+            },
+            bodyContent = {
+                Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
+                    TextField(value = username, onValueChange = { username = it }, label = { Text("Username") })
+                    TextField(
+                        value = password.value,
+                        onValueChange = { password.value = it },
+                        label = { Text(text = "Password") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password
+                        )
+                    )
+                    TextField(value = guardCode, onValueChange = { guardCode = it }, label = { Text("Guard code") })
+                    Button(onClick = {
+                        login(username = username, password = password.value.text, guardCode = guardCode)
+                    }) {
+                        Text("Login")
                     }
-                })
-            }
-        }
+                    TextField(value = gamekey, onValueChange = { gamekey = it }, label = { Text("Bundle key") })
+                    Button(onClick = {
+                        fetchOrder(gamekey)
+                    }) {
+                        Text("Fetch a Bundle")
+                    }
+                    Button(onClick = {
+                        fetchAllOrders(gson)
+                    }) {
+                        Text("Fetch all Bundles")
+                    }
+                    Button(onClick = {
+                        writeBundlesToDatabase(gson)
+                    }) {
+                        Text("Write Bundles to database")
+                    }
+                    Button(onClick = {
+                        fetchIcons()
+                    }) {
+                        Text("Fetch icons")
+                    }
+                    LazyColumn(
+                        modifier = Modifier.fillMaxHeight()
+                    ) {
+                        items(items = bundleitems, itemContent = { item ->
+                            Card(
+                                shape = RoundedCornerShape(8.dp),
+                                backgroundColor = MaterialTheme.colors.surface,
+                                border = BorderStroke(1.dp, Color.Black),
+                                modifier = Modifier.padding(4.dp).fillMaxWidth(),
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(4.dp),
+                                ) {
+                                    Text(text = item.human_name)
+                                    Text(text = " (${item.category.name})")
+                                }
+                            }
+                        })
+                    }
+                }
+            })
     }
 }
 
 fun fetchIcons() {
     for (subproduct in db!!.subproductQueries.canCacheIcon().executeAsList()) {
         db.subproductQueries.cacheIcon(
-            cached_icon = client.newCall(Request.Builder().url(subproduct.icon!!).get().build()).execute().body!!.bytes(),
-            id = subproduct.id)
+            cached_icon = client.newCall(Request.Builder().url(subproduct.icon!!).get().build())
+                .execute().body!!.bytes(),
+            id = subproduct.id
+        )
     }
 }
 
@@ -236,7 +257,7 @@ fun JsonDownloadStruct.toDownloadStruct(downloadId: Long): DownloadStruct {
 fun JsonSubproduct.category(): Category {
     val hasComicDownloads = downloads
         .flatMap { it.downloadStruct }
-        .map { it.name.orEmpty().toLowerCase()}
+        .map { it.name.orEmpty().toLowerCase() }
         .any { it.contains("cbz") || it.contains("cbr") }
 
     if (hasComicDownloads) return Category.COMIC
@@ -252,7 +273,8 @@ fun JsonHumbleOrder.toHumbleOrder(): HumbleOrder {
         created = created,
         category = product.category,
         human_name = product.humanName,
-        machine_name = product.machineName)
+        machine_name = product.machineName
+    )
 }
 
 fun bundlePresentInDatabase(bundleKey: String): Boolean {
